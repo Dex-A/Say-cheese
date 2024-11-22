@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Text Mirror</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+
+        #camera-feed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror the camera feed */
+        }
+
+        #text-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .text-effect {
+            font-size: 10vw;
+            font-weight: bold;
+            line-height: 1;
+            color: transparent;
+            text-shadow: 
+                2px 2px 5px rgba(255, 0, 0, 0.8),
+                -2px -2px 5px rgba(0, 255, 0, 0.8),
+                4px -4px 5px rgba(0, 0, 255, 0.8),
+                -4px 4px 5px rgba(255, 255, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <!-- Camera Feed -->
+    <video id="camera-feed" autoplay muted></video>
+
+    <!-- Text Overlay -->
+    <div id="text-overlay">
+        <div id="dynamic-text" class="text-effect">HELLO</div>
+    </div>
+
+    <script>
+        const video = document.getElementById('camera-feed');
+        const dynamicText = document.getElementById('dynamic-text');
+        const textOverlay = document.getElementById('text-overlay');
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        // Access the camera
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+            }
+        }
+
+        // Function to generate random letters and numbers with colors
+        function updateTextEffect() {
+            // Generate a random string
+            const randomText = Array.from({ length: 8 })
+                .map(() => letters.charAt(Math.floor(Math.random() * letters.length)))
+                .join("");
+
+            // Update the text content
+            dynamicText.textContent = randomText;
+
+            // Randomize text colors
+            const randomColor = () => Math.floor(Math.random() * 256);
+            dynamicText.style.textShadow = `
+                2px 2px 5px rgba(${randomColor()}, ${randomColor()}, ${randomColor()}, 0.8),
+                -2px -2px 5px rgba(${randomColor()}, ${randomColor()}, ${randomColor()}, 0.8),
+                4px -4px 5px rgba(${randomColor()}, ${randomColor()}, ${randomColor()}, 0.8),
+                -4px 4px 5px rgba(${randomColor()}, ${randomColor()}, ${randomColor()}, 0.8)
+            `;
+        }
+
+        // Periodically update the text effect
+        setInterval(updateTextEffect, 200);
+
+        // Start the camera
+        startCamera();
+    </script>
+</body>
+</html>
